@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diário de Saúde Mental</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Diário de Saúde Mental</h1>
+        <p>Cuidando da sua saúde emocional</p>
+    </header>
+
+    <!-- Menu Inicial -->
+    <nav id="main-menu">
+        <div id="motivational-message" class="motivational-message"></div>
+        <ul>
+            <li><a href="#" onclick="showSection('thought-of-the-day')">Pensamento do Dia</a></li>
+            <li><a href="#" onclick="showSection('emotional-pendings')">Pendências Emocionais</a></li>
+            <li><a href="#" onclick="showSection('calendar')">Calendário</a></li>
+            <li><a href="#" onclick="showSection('history')">Histórico de Pensamentos e Pendências</a></li>
+        </ul>
+    </nav>
+
+    <!-- Seção Pensamento do Dia -->
+    <section id="thought-of-the-day" class="tab-section">
+        <h2>Pensamento do Dia</h2>
+        <textarea id="thought" placeholder="Escreva seu pensamento aqui..."></textarea>
+        <button onclick="saveThought()">Salvar Pensamento</button>
+        <br><br>
+        <button onclick="showMenu()">Voltar ao Menu</button>
+    </section>
+
+    <!-- Seção Pendências Emocionais -->
+    <section id="emotional-pendings" class="tab-section">
+        <h2>Pendências Emocionais</h2>
+        <textarea id="pendings" placeholder="Coloque aqui suas pendências emocionais..."></textarea>
+        <button onclick="savePendings()">Salvar Pendências</button>
+        <br><br>
+        <button onclick="showMenu()">Voltar ao Menu</button>
+    </section>
+
+<!-- Seção Calendário -->
+<section id="calendar" class="tab-section">
+    <h2>Calendário</h2>
+    <h3 id="calendar-title"></h3> <!-- Título do calendário -->
+    <div id="calendar-container"></div>
+    <button onclick="showMenu()">Voltar ao Menu</button>
+</section>
+
+
+    <!-- Seção Histórico -->
+    <section id="history" class="tab-section">
+        <h2>Histórico de Pensamentos e Pendências</h2>
+        
+        <h3>Pensamentos</h3>
+        <ul id="thought-list"></ul>
+        
+        <h3>Pendências Emocionais</h3>
+        <ul id="pendings-list"></ul>
+
+        <button onclick="clearHistory()">Limpar Histórico</button>
+        <br><br>
+        <button onclick="showMenu()">Voltar ao Menu</button>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Diário de Saúde Mental</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
