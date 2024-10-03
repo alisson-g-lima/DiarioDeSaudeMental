@@ -67,6 +67,10 @@ function displayHistory() {
         const li = document.createElement('li');
         li.textContent = `${thought.text} (Data: ${thought.date})`;
         thoughtList.appendChild(li);
+        
+        // Adiciona uma quebra de linha
+        const lineBreak = document.createElement('br');
+        thoughtList.appendChild(lineBreak); // Quebra de linha
     });
 
     // Exibir pendências emocionais
@@ -77,14 +81,20 @@ function displayHistory() {
         const li = document.createElement('li');
         li.textContent = `${pending.text} (Data: ${pending.date})`;
         pendingsList.appendChild(li);
+        
+        // Adiciona uma quebra de linha
+        const lineBreak = document.createElement('br');
+        pendingsList.appendChild(lineBreak); // Quebra de linha
     });
 }
+
 
 // Função para limpar histórico
 function clearHistory() {
     if (confirm("Tem certeza que deseja limpar todo o histórico de pensamentos e pendências emocionais?")) {
         localStorage.removeItem('thoughts');
         localStorage.removeItem('pendings');
+        localStorage.removeItem('emotionalEntries'); // Limpa as emoções
         displayHistory(); // Atualiza o histórico
         alert("Histórico limpo.");
     }
@@ -136,15 +146,15 @@ function showMotivationalMessage() {
 // Função para criar e exibir o calendário
 function createCalendar() {
     const calendarContainer = document.getElementById('calendar-container');
-    const calendarTitle = document.getElementById('calendar-title');
     calendarContainer.innerHTML = ''; // Limpa o conteúdo anterior
 
     const date = new Date();
     const month = date.getMonth();
     const year = date.getFullYear();
+    const today = date.getDate(); // Armazena o dia atual
 
-    // Título do mês
-    calendarTitle.textContent = `${date.toLocaleString('default', { month: 'long' })} ${year}`;
+    // Atualiza o título do mês e do ano
+    document.getElementById('calendar-title').textContent = `${date.toLocaleString('default', { month: 'long' })} ${year}`;
 
     // Criando a grade do calendário
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -182,15 +192,141 @@ function createCalendar() {
             dayElement.title = 'Você tem anotações nesta data!';
         }
 
+        // Adiciona um evento de clique para mostrar os botões de seleção de emoção somente se for o dia atual
+        if (day === today) {
+            dayElement.addEventListener('click', () => showEmotionButtons(dayElement));
+        }
+
         calendarContainer.appendChild(dayElement);
     }
 }
 
 
-// Inicializa o menu ao carregar a página
+// Função para criar e exibir o calendário
+function createCalendar() {
+    const calendarContainer = document.getElementById('calendar-container');
+    calendarContainer.innerHTML = ''; // Limpa o conteúdo anterior
+
+    const date = new Date();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    const today = date.getDate(); // Armazena o dia atual
+
+    // Atualiza o título do mês e do ano
+    document.getElementById('calendar-title').textContent = `${date.toLocaleString('default', { month: 'long' })} ${year}`;
+
+    // Criando a grade do calendário
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay();
+
+    // Adiciona os dias da semana
+    const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    weekDays.forEach(day => {
+        const dayElement = document.createElement('div');
+        dayElement.className = 'day-header';
+        dayElement.textContent = day;
+        calendarContainer.appendChild(dayElement);
+    });
+
+    // Preenchendo os dias em branco
+    for (let i = 0; i < firstDay; i++) {
+        const emptyElement = document.createElement('div');
+        emptyElement.className = 'calendar-day empty';
+        calendarContainer.appendChild(emptyElement);
+    }
+
+    // Preenchendo os dias do mês
+    const emotionalEntries = JSON.parse(localStorage.getItem('emotionalEntries')) || {};
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day';
+        dayElement.textContent = day;
+
+        const currentDate = new Date(year, month, day).toLocaleDateString();
+
+        // Se houver emoção salva, exibe o emoji sobre o dia
+        if (emotionalEntries[currentDate]) {
+            dayElement.innerHTML = `${day} ${emotionalEntries[currentDate]}`;
+        }
+
+        // Adiciona um evento de clique para mostrar os botões de seleção de emoção
+        if (day === today) {
+            dayElement.addEventListener('click', () => showEmotionButtons(dayElement));
+        }
+
+        calendarContainer.appendChild(dayElement);
+    }
+}
+
+// Função para mostrar botões de seleção de emoções
+function showEmotionButtons(dayElement) {
+    // Limpa os botões existentes
+    const existingButtons = document.querySelectorAll('.emotion-button');
+    existingButtons.forEach(button => button.remove());
+
+    // Emoções disponíveis
+    const emotions = {
+        feliz: '😊',
+        triste: '😢',
+        raiva: '😡',
+        ciúmes: '😒',
+        ansioso: '😰',
+        animado: '😄',
+        relaxado: '😌'
+    };
+
+    // Verifica se já existe uma emoção salva para o dia selecionado
+    const date = new Date();
+    const currentDate = new Date(date.getFullYear(), date.getMonth(), dayElement.textContent).toLocaleDateString();
+    const emotionalEntries = JSON.parse(localStorage.getItem('emotionalEntries')) || {};
+
+    // Se já houver uma emoção para o dia, não exibe os botões
+    if (emotionalEntries[currentDate]) {
+        alert('Você já selecionou uma emoção para este dia.');
+        return;
+    }
+
+    // Cria e adiciona botões de emoção ao container
+    const emotionButtonsContainer = document.getElementById('emotion-buttons-container');
+    for (const [emotion, emoji] of Object.entries(emotions)) {
+        const button = document.createElement('button');
+        button.className = 'emotion-button';
+        button.textContent = emoji; // Emoji representando a emoção
+        button.onclick = () => addEmotionToDay(dayElement, emotion, emoji);
+        emotionButtonsContainer.appendChild(button); // Adiciona ao container
+    }
+}
+
+// Função para adicionar a emoção ao dia
+function addEmotionToDay(dayElement, emotion, emoji) {
+    const date = new Date();
+    const currentDate = new Date(date.getFullYear(), date.getMonth(), dayElement.textContent).toLocaleDateString();
+
+    // Armazena a emoção no Local Storage
+    let emotionalEntries = JSON.parse(localStorage.getItem('emotionalEntries')) || {};
+    
+    // Verifica se já existe uma emoção salva para o dia
+    if (emotionalEntries[currentDate]) {
+        alert("Você já selecionou uma emoção para este dia.");
+        return;
+    }
+
+    // Salva a emoção selecionada para o dia
+    emotionalEntries[currentDate] = emoji; // Usa a data como chave
+    localStorage.setItem('emotionalEntries', JSON.stringify(emotionalEntries));
+
+    // Atualiza o elemento do dia com o emoji
+    dayElement.innerHTML = `${dayElement.textContent} ${emoji}`; // Adiciona o emoji ao dia
+    alert(`Emoção '${emotion}' adicionada ao dia ${dayElement.textContent}.`);
+
+    // Remove os botões de emoção após a escolha
+    const existingButtons = document.querySelectorAll('.emotion-button');
+    existingButtons.forEach(button => button.remove());
+}
+
+// Cria o calendário ao carregar a página
 window.onload = function() {
-    showMenu();
+    showMotivationalMessage();
+    createCalendar();
     displayHistory();
-    showMotivationalMessage(); // Exibe a mensagem motivacional ao abrir o site
-    createCalendar(); // Cria e exibe o calendário
 };
