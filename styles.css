@@ -24,8 +24,23 @@ p {
 }
 
 nav {
-    text-align: center;
-    margin-top: 20px;
+    position: relative; /* Permite o posicionamento absoluto do pseudo-elemento */
+    text-align: center; /* Centraliza o texto */
+    padding: 40px 0; /* Mantém o espaçamento dos botões */
+}
+
+nav::before {
+    content: ''; /* Necessário para criar um pseudo-elemento */
+    background-image: url('img/img1.png'); /* Caminho da imagem */
+    background-size: contain; /* Ajusta o tamanho da imagem */
+    background-repeat: no-repeat; /* Evita que a imagem se repita */
+    background-position: center; /* Centraliza a imagem */
+    position: absolute; /* Posiciona a imagem em relação ao nav */
+    top: 245px; /* Ajuste a posição vertical da imagem */
+    left: 0; /* Alinha à esquerda */
+    right: 0; /* Alinha à direita */
+    height: 300px; /* Define a altura da imagem; ajuste conforme necessário */
+    z-index: -1; /* Coloca a imagem atrás dos botões */
 }
 
 ul {
@@ -40,13 +55,14 @@ li {
 
 a {
     text-decoration: none;
-    color: #b583d6;
-    font-size: 1.5rem;
+    color: #b583d6; /* Ou outra cor que você preferir */
+    font-size: 1.8rem;
 }
 
 a:hover {
     color: #945ab6;
 }
+
 
 /* Estilo da mensagem motivacional */
 .motivational-message {
@@ -75,13 +91,13 @@ h3 {
 }
 
 textarea {
-    width: 80%;
-    height: 100px;
+    width: 90%; /* Aumenta a largura da caixa de texto */
+    height: 40vh; /* Mantém a altura proporcionalmente à altura da tela */
     padding: 10px;
     font-size: 1.2rem;
     border: 1px solid #ddd;
     border-radius: 5px;
-    margin-bottom: 20px;
+    margin-bottom: 30px; /* Aumenta o espaçamento entre a caixa de texto e os botões */
 }
 
 button {
@@ -92,6 +108,7 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    margin-bottom: 20px; /* Adiciona um espaçamento maior entre os botões */
 }
 
 button:hover {
