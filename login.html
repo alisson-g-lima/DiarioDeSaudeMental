@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Diário de Saúde Mental</title>
+    <style>
+        /* Estilos principais (claros) */
+        body { font-family: 'Comic Sans MS', cursive, sans-serif; margin: 0; background-color: #f4f0fb; color: #333; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; box-sizing: border-box; transition: background-color 0.3s, color 0.3s; }
+        .auth-icon { width: 150px; height: auto; margin-bottom: 20px; }
+        .auth-container { width: 100%; max-width: 400px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); overflow: hidden; text-align: center; }
+        .auth-header { background-color: #b583d6; padding: 20px; }
+        .auth-header h1 { color: white; font-size: 2.5rem; margin: 0; }
+        .auth-content { padding: 30px; display: flex; flex-direction: column; gap: 15px; }
+        .auth-content input { width: 100%; padding: 15px; font-size: 1.1rem; font-family: 'Comic Sans MS', cursive, sans-serif; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .auth-content input:focus { outline: none; border-color: #b583d6; }
+        .auth-content button { width: 100%; padding: 15px; font-size: 1.2rem; font-family: 'Comic Sans MS', cursive, sans-serif; font-weight: bold; background-color: #b583d6; color: white; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; }
+        .auth-content button:hover { background-color: #945ab6; }
+        .auth-content p { font-size: 1rem; color: #555; margin-top: 10px; }
+        .auth-content a { color: #b583d6; text-decoration: none; font-weight: bold; }
+        .auth-content a:hover { text-decoration: underline; }
+
+        /* REGRAS DO TEMA ESCURO (PALETA LILÁS/ROXO MAIS CLARA) */
+        body.dark-mode { background-color: #2c213a; color: #e0d0f0; }
+        body.dark-mode .auth-container { background-color: #3f3152; }
+        body.dark-mode .auth-header { background-color: #5a4b70; border-bottom: 1px solid #2c213a; }
+        body.dark-mode .auth-content p { color: #a090b0; }
+        body.dark-mode .auth-content a { color: #c792ea; }
+        body.dark-mode .auth-content input { background-color: #2c213a; color: #e0d0f0; border-color: #5a4b70; }
+    </style>
+</head>
+<body>
+    <img src="img/img1.png" alt="Ícone de meditação" class="auth-icon">
+    <div class="auth-container">
+        <div class="auth-header"><h1>Login</h1></div>
+        <div class="auth-content">
+            <input type="text" id="username" placeholder="Nome de usuário" required>
+            <input type="password" id="password" placeholder="Senha" required>
+            <button onclick="loginUser()">Entrar</button>
+            <p>Não tem uma conta? <a href="cadastro.html">Cadastre-se</a></p>
+        </div>
+    </div>
+    <script src="auth.js"></script>
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme_preference');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+        })();
+    </script>
+</body>
+</html>
