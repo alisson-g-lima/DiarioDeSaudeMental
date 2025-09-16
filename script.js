@@ -1,332 +1,365 @@
-// Função para mostrar uma seção específica e esconder as outras
-function showSection(sectionId) {
-    // Esconde todas as seções
-    const sections = document.querySelectorAll('.tab-section');
-    sections.forEach(section => {
-        section.style.display = 'none';
-    });
+// --- GUARDA DE PROTEÇÃO E SETUP INICIAL ---
+const loggedInUser = sessionStorage.getItem('loggedInUser');
 
-    // Mostra a seção clicada
-    document.getElementById(sectionId).style.display = 'block';
+(function() {
+    if (!loggedInUser) {
+        window.location.href = 'login.html';
+    }
+})();
 
-    // Esconde o menu principal
-    document.getElementById('main-menu').style.display = 'none';
+// --- LÓGICA DO TEMA ESCURO (DARK MODE) ---
+// Esta função é executada imediatamente para aplicar o tema salvo
+(function() {
+    const savedTheme = localStorage.getItem(`theme_${loggedInUser}`);
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+    }
+})();
+
+function toggleTheme() {
+    document.body.classList.toggle('dark-mode');
+    
+    // Salva a preferência do tema para o usuário logado
+    if (document.body.classList.contains('dark-mode')) {
+        localStorage.setItem(`theme_${loggedInUser}`, 'dark');
+    } else {
+        localStorage.setItem(`theme_${loggedInUser}`, 'light');
+    }
 }
 
-// Função para mostrar o menu principal e esconder todas as seções
-function showMenu() {
-    // Esconde todas as seções
-    const sections = document.querySelectorAll('.tab-section');
-    sections.forEach(section => {
-        section.style.display = 'none';
-    });
 
-    // Mostra o menu principal
+// --- FUNÇÃO para pegar as iniciais do nome de usuário ---
+function getInitials(name) {
+    if (!name) return '';
+    return name.substring(0, 1).toUpperCase();
+}
+
+// --- LÓGICA DE LOGOUT ---
+function logout() {
+    sessionStorage.removeItem('loggedInUser');
+    window.location.href = 'login.html';
+}
+
+// --- FUNÇÕES DE NAVEGAÇÃO E UI ---
+function showSection(sectionId) {
+    document.querySelectorAll('.tab-section').forEach(s => s.style.display = 'none');
+    document.getElementById(sectionId).style.display = 'block';
+    document.getElementById('main-menu').style.display = 'none';
+    if (sectionId === 'history') {
+        document.getElementById("defaultOpenTab").click();
+    }
+}
+
+function showMenu() {
+    document.querySelectorAll('.tab-section').forEach(s => s.style.display = 'none');
     document.getElementById('main-menu').style.display = 'block';
 }
 
-// Função para salvar pensamento do dia
-function saveThought() {
-    const thought = document.getElementById('thought').value;
-    const date = new Date().toLocaleDateString();
-    if (thought) {
-        let thoughts = JSON.parse(localStorage.getItem('thoughts')) || [];
-        thoughts.push({ text: thought, date: date });
-        localStorage.setItem('thoughts', JSON.stringify(thoughts));
-        alert("Pensamento do dia salvo!");
-        document.getElementById('thought').value = ''; // Limpa o campo
-        displayHistory(); // Atualiza o histórico
+function showFeedback(elementId, message) {
+    const feedbackEl = document.getElementById(elementId);
+    feedbackEl.textContent = message;
+    feedbackEl.classList.add('show');
+    setTimeout(() => { feedbackEl.classList.remove('show'); }, 2000);
+}
+
+// --- LÓGICA DAS ABAS DO HISTÓRICO ---
+function openHistoryTab(evt, tabName) {
+    let tabcontent = document.getElementsByClassName("tab-content");
+    for (let i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    let tablinks = document.getElementsByClassName("tab-link");
+    for (let i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+// --- FUNÇÃO PARA ABRIR/FECHAR O DROPDOWN ---
+function toggleDropdown() {
+    document.getElementById("myDropdown").classList.toggle("show");
+}
+
+// --- FUNÇÕES DE SALVAR DADOS (ESPECÍFICAS DO USUÁRIO) ---
+function saveData(type, textareaId, tagInputId, feedbackId, successMessage) {
+    const content = document.getElementById(textareaId).value;
+    const tagsValue = document.getElementById(tagInputId).value;
+    const tags = tagsValue.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
+
+    if (content) {
+        const userSpecificKey = `${type}_${loggedInUser}`;
+        let items = JSON.parse(localStorage.getItem(userSpecificKey)) || [];
+        items.push({
+            id: Date.now(),
+            text: content,
+            date: new Date().toLocaleDateString('pt-BR'),
+            tags: tags
+        });
+        localStorage.setItem(userSpecificKey, JSON.stringify(items));
+        showFeedback(feedbackId, successMessage);
+        
+        const textarea = document.getElementById(textareaId);
+        textarea.value = '';
+        textarea.style.height = 'auto';
+        document.getElementById(textarea.id + '-char-counter').textContent = '0 caracteres';
+        document.getElementById(tagInputId).value = '';
+
+        displayHistory();
+        createCalendar();
     } else {
-        alert("Por favor, escreva seu pensamento.");
+        alert("Por favor, escreva algo antes de salvar.");
     }
 }
 
-// Função para salvar pendências emocionais
-function savePendings() {
-    const pending = document.getElementById('pendings').value;
-    const date = new Date().toLocaleDateString();
-    if (pending) {
-        let pendings = JSON.parse(localStorage.getItem('pendings')) || [];
-        pendings.push({ text: pending, date: date });
-        localStorage.setItem('pendings', JSON.stringify(pendings));
-        alert("Pendências emocionais salvas!");
-        document.getElementById('pendings').value = ''; // Limpa o campo
-        displayHistory(); // Atualiza o histórico
-    } else {
-        alert("Por favor, escreva suas pendências.");
-    }
-}
+function saveThought() { saveData('thoughts', 'thought', 'thought-tags', 'thought-feedback', 'Pensamento salvo!'); }
+function savePendings() { saveData('pendings', 'pendings', 'pendings-tags', 'pendings-feedback', 'Pendência salva!'); }
+function saveGratitude() { saveData('gratitude', 'gratitude-text', 'gratitude-tags', 'gratitude-feedback', 'Gratidão salva!'); }
 
-// Função para exibir pensamentos e pendências anteriores
+
+// --- FUNÇÕES DE HISTÓRICO (ESPECÍFICAS DO USUÁRIO) ---
 function displayHistory() {
-    // Exibir pensamentos
-    const thoughtList = document.getElementById('thought-list');
-    thoughtList.innerHTML = ''; // Limpa a lista
-    let thoughts = JSON.parse(localStorage.getItem('thoughts')) || [];
-    thoughts.forEach(thought => {
-        const li = document.createElement('li');
-        li.textContent = `${thought.text} (Data: ${thought.date})`;
-        thoughtList.appendChild(li);
-        
-        // Adiciona uma quebra de linha
-        const lineBreak = document.createElement('br');
-        thoughtList.appendChild(lineBreak); // Quebra de linha
-    });
+    const createListHTML = (items, type) => {
+        if (items.length === 0) return '<li>Nenhum registro encontrado.</li>';
+        let htmlString = '';
+        items.slice().reverse().forEach(item => {
+            const tagsHTML = (item.tags && item.tags.length > 0) ? `<div class="entry-tags">${item.tags.map(tag => `<span class="tag-badge" onclick="filterByTag('${tag}')">${tag}</span>`).join('')}</div>` : '';
+            htmlString += `
+                <li data-tags="${item.tags ? item.tags.join(',') : ''}">
+                    <div class="entry-content">${item.text.replace(/\n/g, '<br>')}</div>
+                    ${tagsHTML}
+                    <div class="entry-date">Data: ${item.date}</div>
+                    <div class="entry-actions">
+                        <button onclick="editEntry('${type}', ${item.id})">Editar</button>
+                        <button class="danger" onclick="deleteEntry('${type}', ${item.id})">Excluir</button>
+                    </div>
+                </li>`;
+        });
+        return htmlString;
+    };
 
-    // Exibir pendências emocionais
-    const pendingsList = document.getElementById('pendings-list');
-    pendingsList.innerHTML = ''; // Limpa a lista
-    let pendings = JSON.parse(localStorage.getItem('pendings')) || [];
-    pendings.forEach(pending => {
-        const li = document.createElement('li');
-        li.textContent = `${pending.text} (Data: ${pending.date})`;
-        pendingsList.appendChild(li);
-        
-        // Adiciona uma quebra de linha
-        const lineBreak = document.createElement('br');
-        pendingsList.appendChild(lineBreak); // Quebra de linha
+    const thoughts = JSON.parse(localStorage.getItem(`thoughts_${loggedInUser}`)) || [];
+    const pendings = JSON.parse(localStorage.getItem(`pendings_${loggedInUser}`)) || [];
+    const gratitudes = JSON.parse(localStorage.getItem(`gratitude_${loggedInUser}`)) || [];
+    
+    document.getElementById('thought-list').innerHTML = createListHTML(thoughts, 'thoughts');
+    document.getElementById('pendings-list').innerHTML = createListHTML(pendings, 'pendings');
+    document.getElementById('gratitude-list').innerHTML = createListHTML(gratitudes, 'gratitude');
+}
+
+function filterHistory() {
+    const searchTerm = document.getElementById('history-search').value.toLowerCase();
+    const allEntries = document.querySelectorAll('#thought-list li, #pendings-list li, #gratitude-list li');
+    allEntries.forEach(entry => {
+        if (entry.textContent.toLowerCase().includes(searchTerm)) {
+            entry.style.display = "block";
+        } else {
+            entry.style.display = "none";
+        }
     });
 }
 
+function filterByTag(tag) {
+    document.getElementById('history-search').value = tag;
+    filterHistory();
+}
 
-// Função para limpar histórico
+function editEntry(type, id) {
+    const userSpecificKey = `${type}_${loggedInUser}`;
+    let items = JSON.parse(localStorage.getItem(userSpecificKey)) || [];
+    const itemToEdit = items.find(item => item.id === id);
+    if (!itemToEdit) return;
+    const newText = prompt("Edite seu registro:", itemToEdit.text);
+    if (newText !== null && newText.trim() !== "") {
+        itemToEdit.text = newText;
+        localStorage.setItem(userSpecificKey, JSON.stringify(items));
+        displayHistory();
+    }
+}
+
+function deleteEntry(type, id) {
+    if (confirm("Tem certeza que deseja excluir este registro?")) {
+        const userSpecificKey = `${type}_${loggedInUser}`;
+        let items = JSON.parse(localStorage.getItem(userSpecificKey)) || [];
+        const updatedItems = items.filter(item => item.id !== id);
+        localStorage.setItem(userSpecificKey, JSON.stringify(updatedItems));
+        displayHistory();
+        createCalendar();
+    }
+}
+
 function clearHistory() {
-    if (confirm("Tem certeza que deseja limpar todo o histórico de pensamentos e pendências emocionais?")) {
-        localStorage.removeItem('thoughts');
-        localStorage.removeItem('pendings');
-        localStorage.removeItem('emotionalEntries'); // Limpa as emoções
-        displayHistory(); // Atualiza o histórico
+    if (confirm("Tem certeza que deseja apagar TODO o histórico? Esta ação não pode ser desfeita.")) {
+        localStorage.removeItem(`thoughts_${loggedInUser}`);
+        localStorage.removeItem(`pendings_${loggedInUser}`);
+        localStorage.removeItem(`gratitude_${loggedInUser}`);
+        localStorage.removeItem(`emotionalEntries_${loggedInUser}`);
+        displayHistory();
+        createCalendar();
         alert("Histórico limpo.");
     }
 }
 
-// Função para mostrar uma mensagem motivacional aleatória
+// --- CALENDÁRIO E MODAL (ESPECÍFICOS DO USUÁRIO) ---
+function createCalendar() {
+    const calendarContainer = document.getElementById('calendar-container');
+    calendarContainer.innerHTML = '';
+    const now = new Date();
+    const month = now.getMonth();
+    const year = now.getFullYear();
+    document.getElementById('calendar-title').textContent = `${now.toLocaleString('pt-BR', { month: 'long' })} ${year}`;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay();
+    const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    weekDays.forEach(day => {
+        const dayElement = document.createElement('div');
+        dayElement.className = 'day-header';
+        dayElement.textContent = day;
+        calendarContainer.appendChild(dayElement);
+    });
+    for (let i = 0; i < firstDay; i++) { calendarContainer.appendChild(document.createElement('div')); }
+
+    const thoughts = JSON.parse(localStorage.getItem(`thoughts_${loggedInUser}`)) || [];
+    const pendings = JSON.parse(localStorage.getItem(`pendings_${loggedInUser}`)) || [];
+    const gratitudes = JSON.parse(localStorage.getItem(`gratitude_${loggedInUser}`)) || [];
+    const emotionalEntries = JSON.parse(localStorage.getItem(`emotionalEntries_${loggedInUser}`)) || {};
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day';
+        const currentDateStr = new Date(year, month, day).toLocaleDateString('pt-BR');
+        let dayContent = day;
+        if (emotionalEntries[currentDateStr]) { dayContent += ` ${emotionalEntries[currentDateStr]}`; }
+        dayElement.innerHTML = dayContent;
+        if (day === now.getDate() && month === now.getMonth() && year === now.getFullYear()) { dayElement.classList.add('today'); }
+        const hasNotes = thoughts.some(t => t.date === currentDateStr) || pendings.some(p => p.date === currentDateStr) || gratitudes.some(g => g.date === currentDateStr);
+        if (hasNotes) { dayElement.classList.add('has-notes'); }
+        dayElement.addEventListener('click', () => openDayModal(currentDateStr));
+        calendarContainer.appendChild(dayElement);
+    }
+}
+
+function openDayModal(dateStr) {
+    const modal = document.getElementById('day-modal');
+    const modalBody = document.getElementById('modal-body');
+    const emotionButtonsContainer = document.getElementById('modal-emotion-buttons');
+    document.getElementById('modal-date').textContent = `Registros do dia ${dateStr}`;
+    modalBody.innerHTML = '';
+    emotionButtonsContainer.innerHTML = '';
+
+    const thoughts = (JSON.parse(localStorage.getItem(`thoughts_${loggedInUser}`)) || []).filter(item => item.date === dateStr);
+    const pendings = (JSON.parse(localStorage.getItem(`pendings_${loggedInUser}`)) || []).filter(item => item.date === dateStr);
+    const gratitudes = (JSON.parse(localStorage.getItem(`gratitude_${loggedInUser}`)) || []).filter(item => item.date === dateStr);
+
+    if (thoughts.length === 0 && pendings.length === 0 && gratitudes.length === 0) {
+        modalBody.innerHTML = '<p>Nenhum registro de texto para este dia.</p>';
+    } else {
+        if (thoughts.length > 0) modalBody.innerHTML += '<h4>Pensamentos</h4>' + thoughts.map(t => `<p>${t.text.replace(/\n/g, '<br>')}</p>`).join('');
+        if (pendings.length > 0) modalBody.innerHTML += '<h4>Pendências Emocionais</h4>' + pendings.map(p => `<p>${p.text.replace(/\n/g, '<br>')}</p>`).join('');
+        if (gratitudes.length > 0) modalBody.innerHTML += '<h4>Gratidão</h4>' + gratitudes.map(g => `<p>${g.text.replace(/\n/g, '<br>')}</p>`).join('');
+    }
+    
+    const emotions = { feliz: '😊', triste: '😢', raiva: '😡', ansioso: '😰', animado: '😄', relaxado: '😌' };
+    for (const [emotion, emoji] of Object.entries(emotions)) {
+        const button = document.createElement('button');
+        button.textContent = emoji;
+        button.onclick = () => {
+            const emotionalEntriesKey = `emotionalEntries_${loggedInUser}`;
+            let emotionalEntries = JSON.parse(localStorage.getItem(emotionalEntriesKey)) || {};
+            emotionalEntries[dateStr] = emoji;
+            localStorage.setItem(emotionalEntriesKey, JSON.stringify(emotionalEntries));
+            closeModal();
+            createCalendar(); 
+        };
+        emotionButtonsContainer.appendChild(button);
+    }
+    modal.style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('day-modal').style.display = 'none';
+}
+
+// --- INICIALIZAÇÃO E FUNÇÕES FINAIS ---
 function showMotivationalMessage() {
-    const messages = [
-        "Acredite em si mesmo e em suas capacidades!",
-        "Cada pequeno passo é um progresso.",
-        "O importante é nunca desistir, mesmo quando for difícil.",
-        "A jornada para o bem-estar começa com um pequeno ato de cuidado.",
-        "Você é mais forte do que pensa.",
-        "Cuidar de si é o primeiro passo para cuidar dos outros.",
-        "Hoje é um bom dia para se sentir bem consigo mesmo!",
-        "Permita-se crescer e melhorar, um dia de cada vez.",
-        "Mesmo nas dificuldades, você está crescendo e aprendendo.",
-        "Não tenha medo de começar de novo. É uma nova chance de fazer melhor.",
-        "Seja gentil consigo mesmo. Você está fazendo o melhor que pode.",
-        "Pequenas vitórias também são conquistas!",
-        "Você é digno de amor e cuidado, principalmente de si mesmo.",
-        "Às vezes, descansar é a melhor maneira de avançar.",
-        "O importante não é a velocidade, mas a direção.",
-        "Cada desafio traz uma nova oportunidade de se superar.",
-        "Acredite: você já superou muitas batalhas antes, e vai superar esta também.",
-        "A jornada é tão importante quanto o destino.",
-        "Não compare seu capítulo 1 com o capítulo 20 de outra pessoa.",
-        "Respire fundo. Você é capaz de lidar com qualquer coisa.",
-        "Seja paciente consigo. Crescer leva tempo.",
-        "Mesmo a mais longa caminhada começa com um passo.",
-        "Cuide da sua mente, ela é o seu bem mais precioso.",
-        "O sol sempre volta a brilhar, mesmo depois de dias nublados.",
-        "Tudo bem não estar bem o tempo todo. Permita-se sentir.",
-        "Você é mais resiliente do que imagina.",
-        "Às vezes, é preciso desacelerar para conseguir enxergar o caminho com clareza.",
-        "A cada dia que passa, você está mais perto de alcançar seus objetivos.",
-        "Confie no processo e valorize seu próprio ritmo.",
-        "Seu bem-estar é prioridade. Cuide-se com carinho.",
-        "Um dia de cada vez. Você está no caminho certo."
-    ];
-
-    // Seleciona aleatoriamente uma mensagem da lista
+    const messages = ["Acredite em si mesmo!", "Cada passo é um progresso.", "Você é mais forte do que pensa."];
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-
-    // Exibe a mensagem no elemento HTML
     document.getElementById('motivational-message').textContent = randomMessage;
 }
 
-// Função para criar e exibir o calendário
-function createCalendar() {
-    const calendarContainer = document.getElementById('calendar-container');
-    calendarContainer.innerHTML = ''; // Limpa o conteúdo anterior
+window.onload = function() {
+    if (loggedInUser) {
+        const userIcon = document.getElementById('user-icon');
+        userIcon.textContent = getInitials(loggedInUser);
 
-    const date = new Date();
-    const month = date.getMonth();
-    const year = date.getFullYear();
-    const today = date.getDate(); // Armazena o dia atual
+        // MODIFICADO: Não precisa mais alterar o texto do botão de tema dinamicamente
+        
+        showMotivationalMessage();
+        createCalendar();
+        displayHistory();
+        document.getElementById("defaultOpenTab").click();
+        
+        const textareas = document.querySelectorAll('textarea');
+        textareas.forEach(textarea => {
+            const counter = document.getElementById(textarea.id + '-char-counter');
+            const adjustTextarea = () => {
+                textarea.style.height = 'auto';
+                textarea.style.height = (textarea.scrollHeight) + 'px';
+                if (counter) { counter.textContent = textarea.value.length + ' caracteres'; }
+            };
+            textarea.addEventListener('input', adjustTextarea);
+            adjustTextarea();
+        });
+    }
+};
 
-    // Atualiza o título do mês e do ano
-    document.getElementById('calendar-title').textContent = `${date.toLocaleString('default', { month: 'long' })} ${year}`;
-
-    // Criando a grade do calendário
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const firstDay = new Date(year, month, 1).getDay();
-
-    // Adiciona os dias da semana
-    const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-    weekDays.forEach(day => {
-        const dayElement = document.createElement('div');
-        dayElement.className = 'day-header';
-        dayElement.textContent = day;
-        calendarContainer.appendChild(dayElement);
-    });
-
-    // Preenchendo os dias em branco
-    for (let i = 0; i < firstDay; i++) {
-        const emptyElement = document.createElement('div');
-        emptyElement.className = 'calendar-day empty';
-        calendarContainer.appendChild(emptyElement);
+window.onclick = function(event) {
+    const modal = document.getElementById('day-modal');
+    if (event.target == modal) {
+        closeModal();
     }
 
-    // Preenchendo os dias do mês
-    for (let day = 1; day <= daysInMonth; day++) {
-        const dayElement = document.createElement('div');
-        dayElement.className = 'calendar-day';
-        dayElement.textContent = day;
-
-        // Verifica se há pensamentos ou pendências salvos nesta data
-        const thoughts = JSON.parse(localStorage.getItem('thoughts')) || [];
-        const pendings = JSON.parse(localStorage.getItem('pendings')) || [];
-        const currentDate = new Date(year, month, day).toLocaleDateString();
-
-        if (thoughts.some(th => th.date === currentDate) || pendings.some(p => p.date === currentDate)) {
-            dayElement.classList.add('has-notes');
-            dayElement.title = 'Você tem anotações nesta data!';
+    if (!event.target.matches('.user-icon')) {
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        for (var i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
         }
-
-        // Adiciona um evento de clique para mostrar os botões de seleção de emoção somente se for o dia atual
-        if (day === today) {
-            dayElement.addEventListener('click', () => showEmotionButtons(dayElement));
-        }
-
-        calendarContainer.appendChild(dayElement);
     }
 }
 
+// --- FUNÇÃO DE EXPORTAÇÃO DE DADOS ---
+function exportData() {
+    if (!loggedInUser) return;
 
-// Função para criar e exibir o calendário
-function createCalendar() {
-    const calendarContainer = document.getElementById('calendar-container');
-    calendarContainer.innerHTML = ''; // Limpa o conteúdo anterior
+    const thoughts = JSON.parse(localStorage.getItem(`thoughts_${loggedInUser}`)) || [];
+    const pendings = JSON.parse(localStorage.getItem(`pendings_${loggedInUser}`)) || [];
+    const gratitudes = JSON.parse(localStorage.getItem(`gratitude_${loggedInUser}`)) || [];
+    const emotionalEntries = JSON.parse(localStorage.getItem(`emotionalEntries_${loggedInUser}`)) || {};
 
-    const date = new Date();
-    const month = date.getMonth();
-    const year = date.getFullYear();
-    const today = date.getDate(); // Armazena o dia atual
-
-    // Atualiza o título do mês e do ano
-    document.getElementById('calendar-title').textContent = `${date.toLocaleString('default', { month: 'long' })} ${year}`;
-
-    // Criando a grade do calendário
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const firstDay = new Date(year, month, 1).getDay();
-
-    // Adiciona os dias da semana
-    const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-    weekDays.forEach(day => {
-        const dayElement = document.createElement('div');
-        dayElement.className = 'day-header';
-        dayElement.textContent = day;
-        calendarContainer.appendChild(dayElement);
-    });
-
-    // Preenchendo os dias em branco
-    for (let i = 0; i < firstDay; i++) {
-        const emptyElement = document.createElement('div');
-        emptyElement.className = 'calendar-day empty';
-        calendarContainer.appendChild(emptyElement);
-    }
-
-    // Preenchendo os dias do mês
-    const emotionalEntries = JSON.parse(localStorage.getItem('emotionalEntries')) || {};
-    for (let day = 1; day <= daysInMonth; day++) {
-        const dayElement = document.createElement('div');
-        dayElement.className = 'calendar-day';
-        dayElement.textContent = day;
-
-        const currentDate = new Date(year, month, day).toLocaleDateString();
-
-        // Se houver emoção salva, exibe o emoji sobre o dia
-        if (emotionalEntries[currentDate]) {
-            dayElement.innerHTML = `${day} ${emotionalEntries[currentDate]}`;
+    const userData = {
+        username: loggedInUser,
+        exportDate: new Date().toISOString(),
+        data: {
+            thoughts: thoughts,
+            pendings: pendings,
+            gratitude: gratitudes,
+            emotionalEntries: emotionalEntries
         }
-
-        // Adiciona um evento de clique para mostrar os botões de seleção de emoção
-        if (day === today) {
-            dayElement.addEventListener('click', () => showEmotionButtons(dayElement));
-        }
-
-        calendarContainer.appendChild(dayElement);
-    }
-}
-
-// Função para mostrar botões de seleção de emoções
-function showEmotionButtons(dayElement) {
-    // Limpa os botões existentes
-    const existingButtons = document.querySelectorAll('.emotion-button');
-    existingButtons.forEach(button => button.remove());
-
-    // Emoções disponíveis
-    const emotions = {
-        feliz: '😊',
-        triste: '😢',
-        raiva: '😡',
-        ciúmes: '😒',
-        ansioso: '😰',
-        animado: '😄',
-        relaxado: '😌'
     };
 
-    // Verifica se já existe uma emoção salva para o dia selecionado
-    const date = new Date();
-    const currentDate = new Date(date.getFullYear(), date.getMonth(), dayElement.textContent).toLocaleDateString();
-    const emotionalEntries = JSON.parse(localStorage.getItem('emotionalEntries')) || {};
+    const dataStr = JSON.stringify(userData, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const fileName = `diario_backup_${loggedInUser}_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.json`;
+    link.download = fileName;
 
-    // Se já houver uma emoção para o dia, não exibe os botões
-    if (emotionalEntries[currentDate]) {
-        alert('Você já selecionou uma emoção para este dia.');
-        return;
-    }
-
-    // Cria e adiciona botões de emoção ao container
-    const emotionButtonsContainer = document.getElementById('emotion-buttons-container');
-    for (const [emotion, emoji] of Object.entries(emotions)) {
-        const button = document.createElement('button');
-        button.className = 'emotion-button';
-        button.textContent = emoji; // Emoji representando a emoção
-        button.onclick = () => addEmotionToDay(dayElement, emotion, emoji);
-        emotionButtonsContainer.appendChild(button); // Adiciona ao container
-    }
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
 }
-
-// Função para adicionar a emoção ao dia
-function addEmotionToDay(dayElement, emotion, emoji) {
-    const date = new Date();
-    const currentDate = new Date(date.getFullYear(), date.getMonth(), dayElement.textContent).toLocaleDateString();
-
-    // Armazena a emoção no Local Storage
-    let emotionalEntries = JSON.parse(localStorage.getItem('emotionalEntries')) || {};
-    
-    // Verifica se já existe uma emoção salva para o dia
-    if (emotionalEntries[currentDate]) {
-        alert("Você já selecionou uma emoção para este dia.");
-        return;
-    }
-
-    // Salva a emoção selecionada para o dia
-    emotionalEntries[currentDate] = emoji; // Usa a data como chave
-    localStorage.setItem('emotionalEntries', JSON.stringify(emotionalEntries));
-
-    // Atualiza o elemento do dia com o emoji
-    dayElement.innerHTML = `${dayElement.textContent} ${emoji}`; // Adiciona o emoji ao dia
-    alert(`Emoção '${emotion}' adicionada ao dia ${dayElement.textContent}.`);
-
-    // Remove os botões de emoção após a escolha
-    const existingButtons = document.querySelectorAll('.emotion-button');
-    existingButtons.forEach(button => button.remove());
-}
-
-// Cria o calendário ao carregar a página
-window.onload = function() {
-    showMotivationalMessage();
-    createCalendar();
-    displayHistory();
-};
