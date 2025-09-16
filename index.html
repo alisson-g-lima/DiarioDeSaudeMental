@@ -7,62 +7,114 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="user-profile-container">
+        <div id="user-icon" class="user-icon" onclick="toggleDropdown()">
+            </div>
+        <div id="myDropdown" class="dropdown-content">
+            <a href="#" onclick="toggleTheme()" id="theme-toggle-button">Alternar Tema</a>
+            <a href="#" onclick="exportData()">Exportar Dados</a> 
+            <a href="#" onclick="logout()">Sair</a>
+        </div>
+    </div>
+
     <header>
         <h1>Diário de Saúde Mental</h1>
         <p>Cuidando da sua saúde emocional</p>
     </header>
 
-    <!-- Menu Inicial -->
     <nav id="main-menu">
         <div id="motivational-message" class="motivational-message"></div>
         <ul>
             <li><a href="#" onclick="showSection('thought-of-the-day')">Pensamento do Dia</a></li>
             <li><a href="#" onclick="showSection('emotional-pendings')">Pendências Emocionais</a></li>
+            <li><a href="#" onclick="showSection('gratitude-box')">Caixa de Gratidão</a></li>
             <li><a href="#" onclick="showSection('calendar')">Calendário</a></li>
-            <li><a href="#" onclick="showSection('history')">Histórico de Pensamentos e Pendências</a></li>
+            <li><a href="#" onclick="showSection('history')">Histórico Completo</a></li>
         </ul>
     </nav>
 
-    <!-- Seção Pensamento do Dia -->
     <section id="thought-of-the-day" class="tab-section">
         <h2>Pensamento do Dia</h2>
-        <textarea id="thought" placeholder="Escreva seu pensamento aqui..."></textarea>
+        <div class="textarea-container">
+            <textarea id="thought" placeholder="Escreva seu pensamento aqui..."></textarea>
+            <div id="thought-char-counter" class="char-counter">0 caracteres</div>
+        </div>
+        <div class="tag-container">
+            <input type="text" id="thought-tags" class="tag-input" placeholder="Adicione tags, separadas por vírgula (ex: trabalho, ansiedade)">
+        </div>
+        <div id="thought-feedback" class="feedback"></div>
         <button onclick="saveThought()">Salvar Pensamento</button>
         <br><br>
         <button onclick="showMenu()">Voltar ao Menu</button>
     </section>
 
-    <!-- Seção Pendências Emocionais -->
     <section id="emotional-pendings" class="tab-section">
         <h2>Pendências Emocionais</h2>
-        <textarea id="pendings" placeholder="Coloque aqui suas pendências emocionais..."></textarea>
+        <div class="textarea-container">
+            <textarea id="pendings" placeholder="Coloque aqui suas pendências emocionais..."></textarea>
+            <div id="pendings-char-counter" class="char-counter">0 caracteres</div>
+        </div>
+        <div class="tag-container">
+            <input type="text" id="pendings-tags" class="tag-input" placeholder="Adicione tags, separadas por vírgula (ex: família, decisão)">
+        </div>
+        <div id="pendings-feedback" class="feedback"></div>
         <button onclick="savePendings()">Salvar Pendências</button>
         <br><br>
         <button onclick="showMenu()">Voltar ao Menu</button>
     </section>
 
-<!-- Seção Calendário -->
-<section id="calendar" class="tab-section">
-    <h2 id="calendar-title"></h2> <!-- Título do calendário -->
-    <div id="calendar-container"></div>
-    <div id="emotion-buttons-container"></div> <!-- Container para os botões de emoção -->
-    <button onclick="showMenu()">Voltar ao Menu</button>
-</section>
-
-    <!-- Seção Histórico -->
-    <section id="history" class="tab-section">
-        <h2>Histórico de Pensamentos e Pendências</h2>
-        
-        <h3>Pensamentos</h3>
-        <ul id="thought-list"></ul>
-        
-        <h3>Pendências Emocionais</h3>
-        <ul id="pendings-list"></ul>
-
-        <button onclick="clearHistory()">Limpar Histórico</button>
+    <section id="gratitude-box" class="tab-section">
+        <h2>Caixa de Gratidão</h2>
+        <div class="textarea-container">
+            <textarea id="gratitude-text" placeholder="Pelo que você é grato(a) hoje?"></textarea>
+            <div id="gratitude-text-char-counter" class="char-counter">0 caracteres</div>
+        </div>
+        <div class="tag-container">
+            <input type="text" id="gratitude-tags" class="tag-input" placeholder="Adicione tags, separadas por vírgula (ex: amigos, natureza)">
+        </div>
+        <div id="gratitude-feedback" class="feedback"></div>
+        <button onclick="saveGratitude()">Salvar Gratidão</button>
         <br><br>
         <button onclick="showMenu()">Voltar ao Menu</button>
     </section>
+
+    <section id="calendar" class="tab-section">
+        <h2 id="calendar-title"></h2>
+        <div id="calendar-container"></div>
+        <br>
+        <button onclick="showMenu()">Voltar ao Menu</button>
+    </section>
+
+    <section id="history" class="tab-section">
+        <h2>Histórico de Registros</h2>
+        <div class="search-container">
+            <input type="text" id="history-search" onkeyup="filterHistory()" placeholder="Buscar nos registros...">
+        </div>
+        <div class="history-tabs">
+            <button class="tab-link" onclick="openHistoryTab(event, 'thoughts-tab')" id="defaultOpenTab">Pensamentos</button>
+            <button class="tab-link" onclick="openHistoryTab(event, 'pendings-tab')">Pendências Emocionais</button>
+            <button class="tab-link" onclick="openHistoryTab(event, 'gratitude-tab')">Gratidão</button>
+        </div>
+        <div id="thoughts-tab" class="tab-content"><ul id="thought-list"></ul></div>
+        <div id="pendings-tab" class="tab-content"><ul id="pendings-list"></ul></div>
+        <div id="gratitude-tab" class="tab-content"><ul id="gratitude-list"></ul></div>
+        <br>
+        <button class="danger" onclick="clearHistory()">Limpar TODO o Histórico</button>
+        <br><br>
+        <button onclick="showMenu()">Voltar ao Menu</button>
+    </section>
+
+    <div id="day-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h3 id="modal-date"></h3>
+            <div id="modal-scroll-container"><div id="modal-body"></div></div>
+            <div id="modal-emotion-selector">
+                <p>Como você se sentiu neste dia?</p>
+                <div id="modal-emotion-buttons"></div>
+            </div>
+        </div>
+    </div>
 
     <footer>
         <p>&copy; 2024 Diário de Saúde Mental</p>
