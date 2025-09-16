@@ -1,10 +1,12 @@
-/* Layout básico e estilo */
+/* Layout básico e estilo ORIGINAL */
 body {
-    font-family: 'Comic Sans MS', cursive, sans-serif; /* Fonte mais informal */
+    font-family: 'Comic Sans MS', cursive, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f0fb;
     color: #333;
+    padding-bottom: 60px;
+    transition: background-color 0.3s, color 0.3s; /* Transição suave */
 }
 
 header {
@@ -14,57 +16,36 @@ header {
     text-align: center;
 }
 
-h1 {
-    margin: 0;
-    font-size: 2.5rem;
-}
-
-p {
-    font-size: 1.2rem;
-}
+h1 { margin: 0; font-size: 2.5rem; }
+p { font-size: 1.2rem; }
+h3 { font-size: 1.6rem; margin-bottom: 10px; color: #b583d6; }
+h4 { font-size: 1.2rem; color: #333; margin-top: 15px; }
 
 nav {
-    position: relative; /* Permite o posicionamento absoluto do pseudo-elemento */
-    text-align: center; /* Centraliza o texto */
-    padding: 40px 0; /* Mantém o espaçamento dos botões */
+    position: relative;
+    text-align: center;
+    padding: 40px 0;
 }
 
 nav::before {
-    content: ''; /* Necessário para criar um pseudo-elemento */
-    background-image: url('img/img1.png'); /* Caminho da imagem */
-    background-size: contain; /* Ajusta o tamanho da imagem */
-    background-repeat: no-repeat; /* Evita que a imagem se repita */
-    background-position: center; /* Centraliza a imagem */
-    position: absolute; /* Posiciona a imagem em relação ao nav */
-    top: 245px; /* Ajuste a posição vertical da imagem */
-    left: 0; /* Alinha à esquerda */
-    right: 0; /* Alinha à direita */
-    height: 300px; /* Define a altura da imagem; ajuste conforme necessário */
-    z-index: -1; /* Coloca a imagem atrás dos botões */
+    content: '';
+    background-image: url('img/img1.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    top: 245px;
+    left: 0;
+    right: 0;
+    height: 300px;
+    z-index: -1;
 }
 
-ul {
-    list-style-type: none;
-    padding: 0;
-}
+ul { list-style-type: none; padding: 0; }
+li { display: inline; margin: 0 15px; }
+a { text-decoration: none; color: #b583d6; font-size: 1.8rem; }
+a:hover { color: #945ab6; }
 
-li {
-    display: inline;
-    margin: 0 15px;
-}
-
-a {
-    text-decoration: none;
-    color: #b583d6; /* Ou outra cor que você preferir */
-    font-size: 1.8rem;
-}
-
-a:hover {
-    color: #945ab6;
-}
-
-
-/* Estilo da mensagem motivacional */
 .motivational-message {
     font-size: 1.4rem;
     color: #b583d6;
@@ -76,44 +57,208 @@ a:hover {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* Seções escondidas por padrão */
 .tab-section {
     display: none;
     padding: 20px;
     text-align: center;
 }
 
-/* Títulos do histórico */
-h3 {
-    font-size: 1.6rem;
-    margin-bottom: 10px;
-    color: #b583d6;
+/* Estilos para Caixas de Texto */
+.textarea-container {
+    width: 90%;
+    margin: 0 auto 10px auto;
+    text-align: right;
 }
 
 textarea {
-    width: 90%; /* Aumenta a largura da caixa de texto */
-    height: 40vh; /* Mantém a altura proporcionalmente à altura da tela */
+    width: 100%;
+    min-height: 20vh;
+    height: auto;
+    padding: 20px;
+    font-size: 1.3rem;
+    line-height: 2.2rem;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    resize: none;
+    overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background-color: #fff;
+    background-image: linear-gradient(#eee .1em, transparent .1em);
+    background-size: 100% 2.2rem;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #b583d6;
+    box-shadow: 0 0 10px rgba(181, 131, 214, 0.5);
+}
+
+.char-counter {
+    font-size: 0.9rem;
+    color: #777;
+    padding: 5px 10px;
+}
+
+/* --- ESTILOS PARA BUSCA E TAGS --- */
+.tag-container {
+    width: 90%;
+    margin: 0 auto 20px auto;
+}
+
+.tag-input {
+    width: 100%;
     padding: 10px;
-    font-size: 1.2rem;
-    border: 1px solid #ddd;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-size: 1rem;
+    border: 2px solid #ddd;
     border-radius: 5px;
-    margin-bottom: 30px; /* Aumenta o espaçamento entre a caixa de texto e os botões */
+    box-sizing: border-box;
+}
+
+.search-container {
+    margin-bottom: 20px;
+}
+
+#history-search {
+    width: 70%;
+    padding: 12px;
+    font-size: 1.1rem;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+}
+
+.entry-tags {
+    margin-top: 10px;
+}
+
+.tag-badge {
+    display: inline-block;
+    background-color: #e0e0e0;
+    color: #333;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.tag-badge:hover {
+    background-color: #b583d6;
+    color: white;
 }
 
 button {
     background-color: #b583d6;
     color: white;
     font-size: 1.2rem;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin-bottom: 20px; /* Adiciona um espaçamento maior entre os botões */
+    margin-bottom: 20px;
 }
 
-button:hover {
-    background-color: #945ab6;
+button:hover { background-color: #945ab6; }
+button.danger { background-color: #e74c3c; }
+button.danger:hover { background-color: #c0392b; }
+
+.feedback {
+    padding: 10px;
+    margin-top: -15px;
+    border-radius: 5px;
+    color: #4CAF50;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    height: 20px;
 }
+.feedback.show { opacity: 1; }
+
+#thought-list li, #pendings-list li, #gratitude-list li {
+    display: block;
+    background-color: #fff;
+    padding: 15px;
+    margin: 10px auto;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    text-align: left;
+    max-width: 80%;
+}
+.entry-content { margin-bottom: 10px; }
+.entry-date { font-size: 0.9em; color: #777; }
+.entry-actions button {
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    margin-right: 10px;
+}
+
+/* Estilos para as abas do histórico */
+.history-tabs {
+    overflow: hidden;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.history-tabs button.tab-link {
+    background-color: inherit;
+    color: #b583d6;
+    float: none;
+    display: inline-block;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 1.4rem;
+    margin-bottom: -2px;
+}
+.history-tabs button.tab-link:hover {
+    background-color: #f4e3ff;
+}
+.history-tabs button.tab-link.active {
+    background-color: #f4f0fb;
+    border-bottom: 3px solid #b583d6;
+    color: #333;
+}
+.tab-content {
+    display: none;
+    padding: 6px 12px;
+    animation: fadeIn 0.5s;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Calendário e Modal */
+#calendar-container {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #fff;
+    width: 80%;
+}
+.day-header { font-weight: bold; text-align: center; color: #b583d6; }
+.calendar-day { padding: 10px; text-align: center; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9; cursor: pointer; position: relative; transition: background-color 0.2s; }
+.calendar-day:hover { background-color: #e6e6e6; }
+.calendar-day.has-notes::after { content: ''; position: absolute; bottom: 4px; right: 4px; width: 8px; height: 8px; background-color: #b583d6; border-radius: 50%; }
+.calendar-day.today { background-color: #b583d6; color: white; font-weight: bold; border: 1px solid #945ab6; }
+.calendar-day.today:hover { background-color: #945ab6; }
+.modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+.modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 500px; border-radius: 10px; text-align: left; position: relative; display: flex; flex-direction: column; }
+.close-button { color: #aaa; position: absolute; top: 5px; right: 15px; font-size: 28px; font-weight: bold; cursor: pointer; }
+.modal-scroll-container { max-height: 60vh; overflow-y: auto; padding-right: 15px; margin-top: 10px; }
+#modal-body h4 { color: #b583d6; border-top: 1px solid #eee; padding-top: 10px; margin-top: 15px; }
+#modal-emotion-selector { border-top: 1px solid #eee; margin-top: 15px; padding-top: 10px; text-align: center; }
+#modal-emotion-buttons button { font-size: 1.8rem; padding: 5px; margin: 0 5px; background: transparent; border: none; border-radius: 50%; cursor: pointer; transition: transform 0.2s; }
+#modal-emotion-buttons button:hover { transform: scale(1.2); }
 
 /* Footer */
 footer {
@@ -126,38 +271,143 @@ footer {
     width: 100%;
 }
 
-#calendar-container {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
-    margin: 20px auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    background-color: #fff;
-    width: 80%;
+/* --- ESTILOS PARA O ÍCONE DE PERFIL DO USUÁRIO --- */
+.user-profile-container {
+    position: fixed;
+    top: 15px;
+    right: 20px;
+    z-index: 1000;
 }
-
-.day-header {
-    font-weight: bold;
-    text-align: center;
+.user-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    /* MODIFICADO: Cores invertidas */
+    background-color: white; 
     color: #b583d6;
-}
-
-.calendar-day {
-    padding: 10px;
-    text-align: center;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
+    /* MODIFICADO: Fonte aumentada */
+    font-size: 1.8rem;
+    font-weight: bold;
     cursor: pointer;
+    /* NOVO: Borda para dar destaque */
+    border: 2px solid #b583d6;
+    box-sizing: border-box; /* Garante que a borda não aumente o tamanho total */
+    
+    /* Centraliza perfeitamente a inicial (já estava correto) */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    transition: transform 0.2s ease-in-out;
+}
+.user-icon:hover {
+    transform: scale(1.1);
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 60px;
+    background-color: white;
+    min-width: 150px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    border-radius: 8px;
+    z-index: 1;
+}
+.dropdown-content a {
+    color: #333;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+    font-size: 1rem;
+}
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+    border-radius: 8px;
+}
+.dropdown-content.show {
+    display: block;
 }
 
-.calendar-day:hover {
-    background-color: #e6e6e6;
+/* --- TEMA ESCURO (DARK MODE) - PALETA DE LILÁS/ROXO --- */
+body.dark-mode {
+    background-color: #2c213a; /* Roxo escuro */
+    color: #e0d0f0;             /* Lilás bem claro para texto */
 }
-
-.has-notes {
-    background-color: #b583d6;
-    color: white;
+body.dark-mode header,
+body.dark-mode footer {
+    background-color: #3f3152; /* Roxo médio */
+    border-bottom: 1px solid #5a4b70;
+}
+body.dark-mode .motivational-message {
+    background-color: #3f3152;
+    color: #c792ea; /* Roxo vibrante */
+}
+body.dark-mode a {
+    color: #c792ea; /* Roxo vibrante para links */
+}
+body.dark-mode a:hover {
+    color: #b583d6; /* Roxo original mais escuro */
+}
+body.dark-mode textarea {
+    background-color: #3f3152;
+    color: #e0d0f0;
+    border-color: #5a4b70;
+    background-image: linear-gradient(#5a4b70 .1em, transparent .1em);
+}
+body.dark-mode .char-counter,
+body.dark-mode .entry-date {
+    color: #a090b0; /* Lilás acinzentado para texto secundário */
+}
+body.dark-mode .tag-input,
+body.dark-mode #history-search {
+    background-color: #3f3152;
+    color: #e0d0f0;
+    border-color: #5a4b70;
+}
+body.dark-mode .tag-badge {
+    background-color: #5a4b70;
+    color: #e0d0f0;
+}
+body.dark-mode .tag-badge:hover {
+    background-color: #c792ea;
+    color: #2c213a; /* Roxo escuro para texto ao hover */
+}
+body.dark-mode #thought-list li,
+body.dark-mode #pendings-list li,
+body.dark-mode #gratitude-list li {
+    background-color: #3f3152;
+    box-shadow: none;
+    border: 1px solid #5a4b70;
+}
+body.dark-mode .history-tabs {
+    border-bottom-color: #5a4b70;
+}
+body.dark-mode .history-tabs button.tab-link.active {
+    background-color: #2c213a;
+    border-bottom-color: #c792ea;
+    color: #e0d0f0;
+}
+body.dark-mode #calendar-container,
+body.dark-mode .modal-content,
+body.dark-mode .dropdown-content {
+    background-color: #3f3152;
+    border-color: #5a4b70;
+}
+body.dark-mode .calendar-day {
+    background-color: #2c213a;
+    border-color: #5a4b70;
+}
+body.dark-mode .calendar-day:hover {
+    background-color: #5a4b70;
+}
+body.dark-mode .dropdown-content a {
+    color: #e0d0f0;
+}
+body.dark-mode .dropdown-content a:hover {
+    background-color: #5a4b70;
+}
+body.dark-mode .close-button {
+    color: #a090b0;
 }
