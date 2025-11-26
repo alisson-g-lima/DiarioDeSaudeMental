@@ -1,4 +1,3 @@
-// --- GUARDA DE PROTEÇÃO E SETUP INICIAL ---
 const loggedInUser = sessionStorage.getItem('loggedInUser');
 
 (function() {
@@ -7,8 +6,6 @@ const loggedInUser = sessionStorage.getItem('loggedInUser');
     }
 })();
 
-// --- LÓGICA DO TEMA ESCURO (DARK MODE) ---
-// Esta função é executada imediatamente para aplicar o tema salvo
 (function() {
     const savedTheme = localStorage.getItem(`theme_${loggedInUser}`);
     if (savedTheme === 'dark') {
@@ -19,7 +16,6 @@ const loggedInUser = sessionStorage.getItem('loggedInUser');
 function toggleTheme() {
     document.body.classList.toggle('dark-mode');
     
-    // Salva a preferência do tema para o usuário logado
     if (document.body.classList.contains('dark-mode')) {
         localStorage.setItem(`theme_${loggedInUser}`, 'dark');
     } else {
@@ -27,20 +23,16 @@ function toggleTheme() {
     }
 }
 
-
-// --- FUNÇÃO para pegar as iniciais do nome de usuário ---
 function getInitials(name) {
     if (!name) return '';
     return name.substring(0, 1).toUpperCase();
 }
 
-// --- LÓGICA DE LOGOUT ---
 function logout() {
     sessionStorage.removeItem('loggedInUser');
     window.location.href = 'login.html';
 }
 
-// --- FUNÇÕES DE NAVEGAÇÃO E UI ---
 function showSection(sectionId) {
     document.querySelectorAll('.tab-section').forEach(s => s.style.display = 'none');
     document.getElementById(sectionId).style.display = 'block';
@@ -62,7 +54,6 @@ function showFeedback(elementId, message) {
     setTimeout(() => { feedbackEl.classList.remove('show'); }, 2000);
 }
 
-// --- LÓGICA DAS ABAS DO HISTÓRICO ---
 function openHistoryTab(evt, tabName) {
     let tabcontent = document.getElementsByClassName("tab-content");
     for (let i = 0; i < tabcontent.length; i++) {
@@ -76,12 +67,10 @@ function openHistoryTab(evt, tabName) {
     evt.currentTarget.className += " active";
 }
 
-// --- FUNÇÃO PARA ABRIR/FECHAR O DROPDOWN ---
 function toggleDropdown() {
     document.getElementById("myDropdown").classList.toggle("show");
 }
 
-// --- FUNÇÕES DE SALVAR DADOS (ESPECÍFICAS DO USUÁRIO) ---
 function saveData(type, textareaId, tagInputId, feedbackId, successMessage) {
     const content = document.getElementById(textareaId).value;
     const tagsValue = document.getElementById(tagInputId).value;
@@ -116,8 +105,6 @@ function saveThought() { saveData('thoughts', 'thought', 'thought-tags', 'though
 function savePendings() { saveData('pendings', 'pendings', 'pendings-tags', 'pendings-feedback', 'Pendência salva!'); }
 function saveGratitude() { saveData('gratitude', 'gratitude-text', 'gratitude-tags', 'gratitude-feedback', 'Gratidão salva!'); }
 
-
-// --- FUNÇÕES DE HISTÓRICO (ESPECÍFICAS DO USUÁRIO) ---
 function displayHistory() {
     const createListHTML = (items, type) => {
         if (items.length === 0) return '<li>Nenhum registro encontrado.</li>';
@@ -200,7 +187,6 @@ function clearHistory() {
     }
 }
 
-// --- CALENDÁRIO E MODAL (ESPECÍFICOS DO USUÁRIO) ---
 function createCalendar() {
     const calendarContainer = document.getElementById('calendar-container');
     calendarContainer.innerHTML = '';
@@ -280,7 +266,6 @@ function closeModal() {
     document.getElementById('day-modal').style.display = 'none';
 }
 
-// --- INICIALIZAÇÃO E FUNÇÕES FINAIS ---
 function showMotivationalMessage() {
     const messages = ["Acredite em si mesmo!", "Cada passo é um progresso.", "Você é mais forte do que pensa."];
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];
@@ -291,8 +276,6 @@ window.onload = function() {
     if (loggedInUser) {
         const userIcon = document.getElementById('user-icon');
         userIcon.textContent = getInitials(loggedInUser);
-
-        // MODIFICADO: Não precisa mais alterar o texto do botão de tema dinamicamente
         
         showMotivationalMessage();
         createCalendar();
@@ -330,7 +313,6 @@ window.onclick = function(event) {
     }
 }
 
-// --- FUNÇÃO DE EXPORTAÇÃO DE DADOS ---
 function exportData() {
     if (!loggedInUser) return;
 
@@ -363,3 +345,4 @@ function exportData() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 }
+
